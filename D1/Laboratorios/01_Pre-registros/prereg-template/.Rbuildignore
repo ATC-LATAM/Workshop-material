@@ -1,0 +1,9 @@
+^CRAN-RELEASE$
+^.*\.Rproj$
+^\.Rproj\.user$
+
+^.github$
+^.travis.yml
+^cran-comments.md
+^README.Rmd
+^README_files$

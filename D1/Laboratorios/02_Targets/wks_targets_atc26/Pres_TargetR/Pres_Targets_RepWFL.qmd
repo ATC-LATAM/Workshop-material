@@ -1,0 +1,228 @@
+---
+title: "Flujo de trabajo reproducible con R y {targets}"
+subtitle: "Laboratorio Abre Tu Ciencia <br> ![](Images/logo_targets.svg){width=15%}"
+author: "José Daniel Conejeros, Msc."
+date: today 
+date-format: long
+lang: es
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    slide-number: true
+    slide-number-style: [bottom-right]
+    progress: true
+    transition: fade
+    background-transition: fade
+    transition-speed: fast
+    logo: "Images/ATC26.png"
+    footer: '<i class="fa fa-envelope"></i> <jdconejeros@uc.cl> | <i class="fab fa-github"></i> [JDConejeros](https://github.com/JDConejeros) | ATC 2026 | © Hecho en <a href="https://quarto.org/">Quarto <i class="fa fa-mug-hot"></i></a>'
+    html-math-method: mathjax
+    preview-links: true
+    code-fold: true
+    code-tools: true
+    highlight-style: github
+    fig-width: 10
+    fig-height: 6
+    fig-dpi: 300
+---
+
+
+
+## Hoy hablaremos sobre
+
+
+:::: {.columns}
+
+::: {.column width="60%"}
+<br>
+
+- Automatización de `workflows`
+- Introducción de `targets` en R
+
+Link al material:  <a href="https://github.com/JDConejeros/wks_targets_atc26" class="btn btn-primary" style="background-color: #238636; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">
+  <i class="fab fa-github"></i> Código
+</a>
+
+:::
+
+::: {.column width="40%"}
+<div style="width:100%;height:0;padding-bottom:100%;position:relative;"><iframe src="https://giphy.com/embed/XdDsb6psTES0eQo8Vg" width="100%" height="100%" style="position:absolute" frameBorder="0" class="giphy-embed" allowFullScreen></iframe></div><p></p>
+:::
+
+::::
+
+::: {.callout-note}
+*En Python el proceso es análogo con [snakemake](https://snakemake.readthedocs.io/en/stable/tutorial/interaction_visualization_reporting/tutorial.html).*
+
+:::
+
+
+## ¿Por qué automatizar un flujo?
+
+Por **workflow** o flujo de trabajo nos referimos a la serie de pasos para llevar a cabo un análisis de datos.
+
+- Reproducibilidad: Obtener resultados utilizando los mismos datos de entrada, pasos computacionales, métodos, código y condiciones de análisis.
+
+Pero además:
+
+- Eficiencia. 
+- Escalabilidad.
+- Mantenimiento. 
+
+## Desafíos de la reproducibilidad
+
+1. Directorios/rutas de trabajo.
+2. Paquetes y versionamiento.
+3. Pipeline o flujo poco claro.
+4. Sin información de dependencias.
+5. Cambios en el código. 
+
+
+## Targets 
+
+:::: {.columns}
+
+::: {.column width="30%"}
+![](Images/logo_targets.svg){width=70%} 
+:::
+
+::: {.column width="70%"}
+El paquete `targets` es una herramienta de pipeline para R enfocada en análisis estadístico y ciencia de datos: coordina una serie de pasos computacionales (llamados *targets*) y, al igual que otros sistemas de flujo de trabajo, evita recalcular pasos cuyos datos o código no han cambiado, lo que ahorra tiempo y mejora la reproducibilidad de proyectos complejos. 
+
+
+:::
+
+::::
+
+
+
+Cada *target* representa una tarea definida por funciones de R, y la estructura de dependencias entre ellos forma un gráfico acíclico dirigido (DAG) que targets utiliza para decidir qué ejecutar y qué saltarse. 
+
+Puedes ver toda la documentación aquí: <a href="https://books.ropensci.org/targets/" class="btn btn-primary" style="background-color: #2c5282; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">
+  <i class="fab fa-github"></i> Manual
+</a> <a href="https://docs.ropensci.org/targets/" class="btn btn-primary" style="background-color: #238636; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">
+  <i class="fab fa-github"></i> Repositorio
+</a>
+
+## ¿Por qué targets?
+
+![](Images/notebook-dilemma.png){fig-align="center"}
+
+¿Qué debo volver a correr?, ¿puedo saltarme pasos para ahorrar tiempo?, ¿qué modelos específicos se ven afectados?, ¿tengo que rehacer todo para garantizar reproducibilidad?
+
+## Targets
+
+La filosofía del paquete impulsa un estilo de programación **orientado a funciones dentro de R**, promueve reproducibilidad al abstraer archivos como objetos de R y facilita paralelización implícita, lo que permite construir análisis eficientemente, mantenerlos organizados y asegurar que los resultados sean coherentes con el código y los datos actuales
+
+Algunas alternativas:
+
+- Paquete [drake](https://docs.ropensci.org/drake/) (antecesor de targets).
+- Paquete [workflowr](https://workflowr.github.io/workflowr/) (no gestiona dependencias).  
+
+## Targets
+
+![](Images/pipeline_graph.png){fig-align="center"}
+
+
+1. Actualiza solo lo necesario. 
+2. Cálculos escalables.
+3. Gestiona los datos de salida.
+
+## Targets
+
+**Principales funciones de trabajo**:
+
+1.  Definición del pipeline:
+
+	- `tar_pipeline()`: define el pipeline completo como una colección de targets.
+	- `tar_target()`: **define un paso del pipeline (un objeto o resultado a producir)**.
+	- `tar_option_set()`: define opciones globales del pipeline (paquetes, formato, recursos).
+	- `tar_source()`: carga archivos R con funciones o targets auxiliares.
+
+## Targets
+
+**Principales funciones de trabajo**:
+
+2. Ejecución y control: 
+
+	- `tar_make()`: **ejecuta el pipeline, corriendo solo lo que está desactualizado**.
+	- `tar_make_clustermq()`: ejecuta el pipeline en paralelo usando clustermq.
+	- `tar_make_future()`: ejecuta el pipeline en paralelo usando future.
+	- `tar_destroy()`: borra el estado del pipeline y la cache.
+	- `tar_prune()`: elimina targets obsoletos de la cache.
+
+## Targets
+
+**Principales funciones de trabajo**:
+
+3.  Inspección y diagnóstico: 
+
+	- `tar_visnetwork()`: visualiza el DAG del pipeline.
+	- `tar_glimpse()`: muestra un resumen rápido de los targets.
+	- `tar_progress()`: muestra el progreso de ejecución.
+	- `tar_outdated()`: identifica qué targets necesitan re‐ejecutarse.
+	- `tar_meta()`: inspecciona metadatos de los targets.
+	- `tar_manifest()`: lista todos los targets definidos.
+
+## Targets
+
+**Principales funciones de trabajo**:
+
+4.  Branching (reemplaza loops manuales por paralelización declarativa): 
+
+	- `tar_map()`: define branching dinámico a partir de una lista o vector.
+	- `tar_combine()`: combina los resultados de múltiples ramas en un solo target.
+	- `tar_group()`: agrupa ramas para control de ejecución.
+	- `tar_rep()`: replica un target múltiples veces (útil para simulaciones).
+
+## Targets
+
+**Principales funciones de trabajo**:
+
+5. Reportes y comunicación:
+
+	- `tar_render()`: renderiza documentos Quarto/R Markdown como parte del pipeline.
+	- `tar_quarto()`: renderiza documentos Quarto (.qmd) integrados al pipeline.
+	- `tar_read()`: recupera el valor de un target ya calculado.
+	- `tar_load()`: carga targets directamente en el entorno de R.
+
+## Recomendaciones iniciales
+
+- Empieza con proyectos pequeños.
+- Aunque tome más tiempo, incorpora estas herramientas desde el inicio.
+- Tal vez cambie un poco tu forma de trabajar, pero los beneficios valen la pena.
+- Consulta la documentación oficial y ejemplos en línea:  <a href="https://books.ropensci.org/targets/" class="btn btn-primary" style="background-color: #2c5282; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">
+  <i class="fab fa-github"></i> Intro a Targets </a>
+
+## Universo Targets
+
+<br>
+
+![](Images/targetopia.png){fig-align="center" style="max-width:70%" style="max-height:70%"}
+
+🔗 [https://wlandau.github.io/targetopia/packages.html](https://wlandau.github.io/targetopia/packages.html)
+
+
+
+## Recomendaciones joya
+
+- Estructura de proyectos por Danielle Navarro: 🔗 [Slides](https://djnavarro.net/slides-project-structure/#1)
+- Ciencia Reproducible por Dan Ovando: 🔗 [Slides](https://danovando.github.io/reproducible-workflow/presentations/reproducibility-101#1)
+- Proyectos Buenos por Barbara Vreede: 🔗 [Repositorio](https://github.com/bvreede/good-enough-project)
+- Automatización de workflows en R y Python con targets y snakemake por Diana García Cortés: 🔗 [Repositorio](https://github.com/ddiannae/latinr-targets?tab=readme-ov-file)
+- Introducción a Targets por Will Landau 🔗 [Slides](https://wlandau.github.io/targets-intro/#/section)
+- Protocolos de Análisis Reproducible por Lisa: 🔗 [Website](https://lisacoes.com/protocolos/a-ipo-rep/)
+
+
+## Manos a los datos
+
+Vamos a utilizar una muestra aleatoria de los datos del artículo académico:
+
+
+::: {.callout-note}
+Blanco, E., Conejeros, J.D., González-Reyes, Á. et al. Heat beyond percentiles: exploring preterm birth risks in Santiago, Chile (1991–2019). *Int Arch Occup Environ Healt* **99**, 5 (2026). <https://doi.org/10.1007/s00420-025-02196-x>
+:::
+
+Puedes acceder a los códigos de este artículo aquí: <a href="https://doi.org/10.5281/zenodo.17316762" class="btn btn-primary" style="background-color: #238636; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">
+  <i class="fab fa-github"></i> Repositorio
+</a>
